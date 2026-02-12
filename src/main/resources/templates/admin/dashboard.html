@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 대시보드</title>
+
+    <style>
+        body {
+            font-family: system-ui;
+            background: #f5f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .page-header {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 100;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+            text-decoration: none;
+            color: #222;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+        }
+
+        .icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .title {
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .desc {
+            font-size: 13px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h2>🛠 관리자 허브</h2>
+    <a th:href="@{/qr/entry}" class="back-btn">← 홈으로</a>
+</div>
+
+<div class="grid">
+
+    <a th:href="@{/admin/view/loans}" class="card">
+        <div class="icon">📚</div>
+        <div class="title">대여 목록</div>
+        <div class="desc">현재 대여 중인 도서 확인</div>
+    </a>
+
+    <a th:href="@{/admin/books/naver}" class="card">
+        <div class="icon">🔍</div>
+        <div class="title">도서 등록</div>
+        <div class="desc">네이버 API로 도서 추가</div>
+    </a>
+
+    <a th:href="@{/admin/inquiries}" class="card">
+        <div class="icon">❓</div>
+        <div class="title">미처리 문의</div>
+        <div class="desc">답변되지 않은 문의</div>
+    </a>
+
+    <a th:href="@{/admin/inquiries/all}" class="card">
+        <div class="icon">📄</div>
+        <div class="title">전체 문의</div>
+        <div class="desc">모든 문의 이력</div>
+    </a>
+
+    <a th:href="@{/admin/qr/print/books}" class="card">
+        <div class="icon">📘</div>
+        <div class="title">책 QR 코드</div>
+        <div class="desc">인쇄 템플릿</div>
+    </a>
+
+    <a th:href="@{/admin/qr/print/tables}" class="card">
+        <div class="icon">📱</div>
+        <div class="title">테이블 QR 코드</div>
+        <div class="desc">인쇄 템플릿</div>
+    </a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>내 대여 목록</title>
+    <style>
+        body{font-family:system-ui;background:#f5f6f8;margin:0;padding:20px;}
+        .wrap{max-width:420px;margin:0 auto;}
+        .card{
+            background:#fff;border-radius:14px;padding:16px;margin-bottom:14px;
+            box-shadow:0 8px 24px rgba(0,0,0,.06);
+        }
+        .page-header {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 100;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            text-decoration: none;
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .page-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .title{font-weight:700;}
+        .muted{color:#666;font-size:14px;margin-top:4px;}
+        .btn{display:inline-block;margin-top:10px;color:#2563eb;font-size:14px;}
+
+        .status {
+            margin-top:8px;
+            font-size:14px;
+            font-weight:600;
+        }
+
+        .safe { color:#6b7280; }
+        .warn { color:#f59e0b; }
+        .danger { color:#ef4444; }
+        .over { color:#b91c1c; font-weight:700; }
+
+        .return-guide {
+            margin-top:10px;
+            font-size:13px;
+            color:#555;
+            line-height:1.5;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="page-header">
+        <h2>📄 내 대여 목록</h2>
+        <a th:href="@{/qr/entry}" class="back-btn">← 홈 화면</a>
+    </div>
+
+    <div th:if="${#lists.isEmpty(loanViews)}" class="muted">
+        현재 대여 중인 도서가 없습니다.
+    </div>
+
+    <div th:each="loan : ${loanViews}" class="card">
+        <div class="title" th:text="${loan.title}"></div>
+        <div class="muted">저자: <span th:text="${loan.author}"></span></div>
+        <div class="muted">
+            반납 기한: <b th:text="${loan.dueDate}"></b>
+        </div>
+
+        <!-- 상태 중심 UX (숫자 노출 없음) -->
+        <div th:if="${loan.daysLeft < 0}" class="status over">
+            🚨 연체 중 – 즉시 반납 필요
+        </div>
+
+        <div th:if="${loan.daysLeft == 0}" class="status danger">
+            ⏰ 오늘까지 반납
+        </div>
+
+        <div th:if="${loan.daysLeft > 0 and loan.daysLeft <= 3}" class="status warn">
+            ⚠️ 반납 임박
+        </div>
+
+        <div th:if="${loan.daysLeft > 3}" class="status safe">
+            ✅ 대여 중
+        </div>
+
+        <div class="return-guide">
+            <strong>📦 반납 방법</strong><br>
+            - 도서관 방문 후 <b>실제 책의 QR 코드를 스캔</b>해 주세요<br>
+            - 보안상 온라인 직접 반납은 지원하지 않습니다
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 도서 목록</title>
+    <style>
+        body { font-family: system-ui; background:#f5f6f8; padding:20px; }
+        .wrap { max-width:900px; margin:0 auto; }
+        table { width:100%; border-collapse:collapse; background:#fff; }
+        th, td { padding:12px; border-bottom:1px solid #eee; }
+        th { background:#f1f5f9; text-align:left; }
+        .available { color:#16a34a; font-weight:600; }
+        .borrowed { color:#dc2626; font-weight:600; }
+        .top { display:flex; justify-content:space-between; margin-bottom:12px; }
+        a.btn { padding:8px 12px; background:#2563eb; color:#fff; text-decoration:none; border-radius:6px; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div class="top">
+        <h2>📚 관리자 도서 목록</h2>
+        <a th:href="@{/admin/books/naver}" class="btn">➕ 네이버 도서 등록</a>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>제목</th>
+            <th>저자</th>
+            <th>출판사</th>
+            <th>ISBN</th>
+            <th>상태</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="book : ${books}">
+            <td th:text="${book.id}"></td>
+            <td th:text="${book.title}"></td>
+            <td th:text="${book.author}"></td>
+            <td th:text="${book.publisher}"></td>
+            <td th:text="${book.isbn}"></td>
+            <td>
+                <span th:if="${book.available}" class="available">대여 가능</span>
+                <span th:if="${!book.available}" class="borrowed">대여 중</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>

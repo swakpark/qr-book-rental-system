@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관리자 문의</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont;
+            background: #f5f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 16px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        p {
+            font-size: 14px;
+            color: #555;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            font-size: 15px;
+            resize: none;
+            min-height: 120px;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 20px;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 16px;
+            font-size: 13px;
+            text-align: center;
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .alert {
+            background: #fee2e2;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page-container">
+    <div class="card">
+
+        <h1>📩 관리자 문의</h1>
+        <p>궁금한 내용을 남겨주세요.</p>
+
+        <!-- 연체 경고 (있을 때만 표시) -->
+        <div th:if="${overduePolicy != null and !overduePolicy.canBorrow()}"
+             class="alert">
+            <b>⚠️ 연체 상태</b><br>
+            연체 <span th:text="${overduePolicy.overdueDays}"></span>일 /
+            연체료 <span th:text="${overduePolicy.penaltyAmount}"></span>원
+        </div>
+
+        <form method="post" th:action="@{/help/inquiry}">
+            <textarea
+                    name="message"
+                    placeholder="문의 내용을 입력해주세요"
+                    required
+            ></textarea>
+
+            <button type="submit">문의 보내기</button>
+        </form>
+
+        <a th:href="@{/qr/entry}" class="back-link">← 홈으로 돌아가기</a>
+    </div>
+</div>
+
+</body>
+</html>

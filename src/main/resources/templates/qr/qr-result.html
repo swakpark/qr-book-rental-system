@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>처리 결과</title>
+
+    <style>
+        body {
+            font-family: system-ui;
+            background: #f5f6f8;
+            margin: 0;
+        }
+        .container {
+            max-width: 420px;
+            margin: 80px auto;
+            background: white;
+            border-radius: 12px;
+            padding: 40px 24px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+        h1 { font-size: 22px; margin-bottom: 12px; }
+        .book-title { color: #555; margin-bottom: 24px; }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+        .outline {
+            background: white;
+            color: #2563eb;
+            border: 1px solid #2563eb;
+        }
+        .hint {
+            font-size: 14px;
+            color: #888;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <!-- 제목 -->
+    <h1 th:text="${errorTitle != null ? errorTitle : message}">
+        처리 결과
+    </h1>
+
+    <!-- 에러 메시지 (연체 등) -->
+    <p th:if="${errorMessage}" th:text="${errorMessage}"></p>
+
+    <!-- 정상 처리일 때만 책 정보 -->
+    <div class="book-title"
+         th:if="${book != null}"
+         th:text="${book.title}">
+    </div>
+
+    <!-- 정상 처리 버튼 -->
+    <a th:if="${book != null}"
+       class="btn"
+       th:href="@{/qr/books/{id}(id=${book.id})}">
+        도서 페이지로 돌아가기
+    </a>
+
+    <!-- 연체 시 관리자 문의 -->
+    <a th:if="${showAdminLink}"
+       href="/help"
+       class="btn outline">
+        관리자 문의
+    </a>
+
+    <div class="hint" th:if="${autoRedirect}">
+        잠시 후 자동으로 이동합니다…
+    </div>
+
+</div>
+
+<script th:if="${autoRedirect}">
+    setTimeout(() => {
+        location.href = "/qr/books/" + [[${book.id}]] + "?token=[[${param.token}]]";
+    }, 1500);
+</script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>대여 목록</title>
+    <style>
+        .page-header {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 100;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            text-decoration: none;
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .page-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h2>📚 도서 대여 목록</h2>
+    <a th:href="@{/admin/dashboard}" class="back-btn">← 관리자 허브</a>
+</div>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>도서명</th>
+            <th>대여자</th>
+            <th>상태</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="loan : ${loans}">
+            <td>
+                <a th:href="@{/admin/view/{id}(id=${loan.book.id})}">
+                    <span th:text="${loan.book.title}"></span>
+                </a>
+            </td>
+            <td th:text="${loan.user.name}"></td>
+            <td th:text="${loan.returned ? '반납 완료' : '대여 중'}"></td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

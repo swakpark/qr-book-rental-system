@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont;
+            background: #f5f6f8;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 24px;
+            font-size: 22px;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #444;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            font-size: 15px;
+        }
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #2563eb;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background: #fff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        .login-card input {
+            width: 100%;
+        }
+        .hint {
+            margin-top: 16px;
+            font-size: 13px;
+            text-align: center;
+            color: #666;
+        }
+        .hint a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <div class="login-card">
+        <h1>📚 도서관 로그인</h1>
+
+        <form th:action="@{/login}" method="post">
+            <input type="hidden" name="redirect" th:value="${param.redirect}">
+
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" placeholder="email@example.com" required>
+
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="비밀번호" required>
+
+            <button type="submit">로그인</button>
+
+            <p th:if="${param.error}" style="color:#d93025; text-align:center;">
+                이메일 또는 비밀번호가 올바르지 않습니다.
+            </p>
+        </form>
+
+        <div class="hint">
+            아직 회원이 아니신가요?
+            <a th:href="@{/register(redirect=${param.redirect})}">회원가입</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

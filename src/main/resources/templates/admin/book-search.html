@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>네이버 도서 검색</title>
+    <style>
+        body { font-family: system-ui; background:#f5f6f8; padding:20px; }
+        .card { background:#fff; padding:12px; border-radius:10px; margin-bottom:10px; }
+        img { height:80px; }
+        .btn { margin-top:8px; display:inline-block; }
+        .page-header {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 100;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            text-decoration: none;
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .page-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h2>🔍 네이버 도서 검색</h2>
+    <a th:href="@{/admin/dashboard}" class="back-btn">← 관리자 허브</a>
+</div>
+
+<form method="get" action="/admin/books/naver/search">
+    <input type="text" name="q" placeholder="검색어 입력" th:value="${q}">
+    <button type="submit">검색</button>
+</form>
+
+<hr>
+
+<div th:if="${items != null}">
+    <div th:each="book : ${items}" class="card">
+        <img th:src="${book.image}">
+        <div><b th:utext="${book.title}"></b></div>
+        <div th:text="${book.author}"></div>
+        <div th:text="${book.publisher}"></div>
+
+        <form method="post" action="/admin/books/naver/import">
+            <input type="hidden" name="isbn" th:value="${book.isbn}">
+            <button type="submit" class="btn">➕ 등록</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>테이블 QR 인쇄</title>
+    <style>
+        .page-header {
+            position: sticky;
+            top: 0;
+            background: #ffffff;
+            z-index: 100;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .back-btn {
+            text-decoration: none;
+            font-size: 14px;
+            color: #2563eb;
+            font-weight: bold;
+        }
+        .page-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        @page { size: A4; margin: 10mm; }
+        body { font-family: system-ui; }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .qr-box {
+            text-align: center;
+            border: 1px solid #ddd;
+            padding: 12px;
+            page-break-inside: avoid;
+        }
+
+        img {
+            width: 160px;
+            height: 160px;
+        }
+
+        .label {
+            font-size: 16px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <h2>🪑 테이블 QR 코드</h2>
+    <a th:href="@{/admin/dashboard}" class="back-btn">← 관리자 허브</a>
+</div>
+
+<p style="margin-bottom:16px; color:#555;">
+    📱 테이블 QR을 찍으면 도서관 서비스를 이용할 수 있어요<br>
+    (도서관 챗봇 · 내 대여 목록 · 관리자 문의 등)
+</p>
+
+<div class="grid">
+    <div class="qr-box" th:each="i : ${#numbers.sequence(1, tableCount)}">
+        <img th:src="@{'/static-qr/tables/table_' + ${i} + '.png'}" />
+        <div class="label">📱 도서관 이용 QR</div>
+        <div class="hint">테이블 [[${i}]]</div>
+    </div>
+</div>
+
+</body>
+</html>

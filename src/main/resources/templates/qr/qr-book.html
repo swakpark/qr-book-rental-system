@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>도서 대여</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        h1 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .book-info {
+            background: white;
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .available {
+            color: #1e8e3e;
+        }
+
+        .unavailable {
+            color: #d93025;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        .loan {
+            background: #1a73e8;
+            color: white;
+        }
+
+        .return {
+            background: #d93025;
+            color: white;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="book-info">
+    <h1>📚 도서 대여</h1>
+
+    <!-- 로그인 상태 표시 -->
+    <div style="font-size:14px; color:#666; margin-top:6px;">
+        <span th:if="${isLoggedIn}">
+            현재 사용자: <b th:text="${user.name}">사용자</b>
+        </span>
+        <span th:if="${!isLoggedIn}">
+            로그인 후 대여할 수 있어요
+        </span>
+    </div>
+</div>
+
+<div class="book-info">
+    <p><strong th:text="${book.title}"></strong></p>
+    <p>저자: <span th:text="${book.author}"></span></p>
+
+    <!-- 연체로 인한 대여 제한 안내 -->
+    <div th:if="${overduePolicy != null and !overduePolicy.canBorrow()}"
+         style="background:#fee2e2; padding:12px; border-radius:8px; margin-bottom:12px;">
+        <b>⚠️ 연체로 대여가 제한되었습니다</b><br/>
+        연체 <span th:text="${overduePolicy.overdueDays}"></span>일 ·
+        연체료 <span th:text="${overduePolicy.penaltyAmount}"></span>원
+    </div>
+
+    <!-- 연체가 없고 대여 가능일 때만 -->
+    <div th:if="${state.name() == 'AVAILABLE'
+        and (overduePolicy == null or overduePolicy.canBorrow())}">
+        <p class="status available">대여 가능</p>
+
+        <!-- 로그인 상태 -->
+        <div th:if="${isLoggedIn}">
+            <form th:action="@{/qr/books/{id}/loan(id=${book.id})}"
+                method="post"
+                onsubmit="handleSubmit(this, '대여 처리 중...')">
+                <input type="hidden" name="token" th:value="${param.token}">
+                <button type="submit" class="loan">대여하기</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 대여 중 -->
+    <div th:if="${state.name() == 'LOANED'}">
+        <p class="status unavailable">현재 대여 중인 도서입니다</p>
+
+        <p th:if="${overduePolicy != null and !overduePolicy.canBorrow()}"
+           style="color:#b91c1c; font-size:14px; margin-top:6px;">
+            🚨 연체 중입니다. 즉시 반납해주세요.
+        </p>
+
+        <div th:if="${isLoggedIn and loan != null and loan.user.id == user.id}">
+            <form th:action="@{/qr/books/{id}/return(id=${book.id})}"
+                  method="post"
+                  onsubmit="handleSubmit(this, '반납 처리 중...')">
+                <input type="hidden" name="token" th:value="${param.token}">
+                <button type="submit" class="return">반납하기</button>
+            </form>
+        </div>
+        <p style="font-size: 14px; color: #666">
+            반납 후 다시 대여할 수 있습니다.
+        </p>
+    </div>
+</div>
+
+<!-- 로그인 / 로그아웃 -->
+<div style="margin-top:16px; text-align:center; font-size:14px;">
+    <!-- 로그인 안 했을 때 -->
+    <div th:if="${!isLoggedIn}">
+        <a th:href="@{/login(redirect=${'/qr/books/' + book.id + '?token=' + param.token})}">
+            로그인 / 회원가입 →
+        </a>
+    </div>
+
+    <!-- 로그인 했을 때 -->
+    <div th:if="${isLoggedIn}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit"
+                    style="background:none;border:none;color:#666;cursor:pointer;">
+                로그아웃
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="footer">
+    QR 스캔으로 바로 대여/반납이 가능합니다
+</div>
+
+</body>
+
+<script>
+function handleSubmit(form, text) {
+    const button = form.querySelector("button");
+    button.disabled = true;
+    button.innerText = text || "처리 중...";
+}
+</script>
+</html>
