@@ -35,6 +35,9 @@ Spring Boot 기반 QR 도서 대여 시스템입니다.
 - Token 생성 / 검증 / 요청 차단 책임 분리
 - Spring Security Filter Chain 이해 기반 설계
 
+## 📐 Architecture
+<img width="769" height="1218" alt="스크린샷 2026-02-10 192618" src="https://github.com/user-attachments/assets/d5c112bc-79d0-400e-87aa-dcd66acf8cf7" />
+
 ---
 
 백엔드 인증/인가 및 보안 설계를 중심으로 구현한 프로젝트입니다.
