@@ -1,0 +1,75 @@
+/* 모바일 기본 가독성 */
+body {
+    font-size: 16px;
+    line-height: 1.6;
+    background: #f5f6f8;
+    margin: 0;
+    padding: 0;
+}
+
+/* 중앙 정렬 + 최대 너비 */
+.container {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+/* 카드 UI */
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* 제목 */
+h1 {
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* 입력폼 */
+input,
+textarea {
+    width: 100%;
+    font-size: 16px;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+}
+
+/* 버튼 */
+button {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+}
+
+/* 주요 버튼 */
+.btn-primary {
+    background: #2563eb;
+    color: #fff;
+}
+
+/* 보조 버튼 */
+.btn-outline {
+    background: #fff;
+    border: 1px solid #ddd;
+}
+
+/* 링크 */
+a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 14px;
+}

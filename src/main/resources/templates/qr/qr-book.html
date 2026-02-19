@@ -84,8 +84,19 @@
 </div>
 
 <div class="book-info">
+    <div style="text-align:center; margin-bottom:16px;">
+        <img th:if="${book.image != null}"
+             th:src="${book.image}"
+             alt="도서 이미지"
+             style="width:140px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.1);" />
+    </div>
+
     <p><strong th:text="${book.title}"></strong></p>
     <p>저자: <span th:text="${book.author}"></span></p>
+
+    <p style="font-size:12px; color:#666;">
+        ISBN: <span th:text="${book.isbn}"></span>
+    </p>
 
     <!-- 연체로 인한 대여 제한 안내 -->
     <div th:if="${overduePolicy != null and !overduePolicy.canBorrow()}"

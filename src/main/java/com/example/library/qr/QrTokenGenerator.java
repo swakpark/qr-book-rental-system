@@ -9,7 +9,7 @@ import java.util.Base64;
 public class QrTokenGenerator {
 
     private static final String SECRET_KEY = "qr-secret-key";
-    private static final long EXPIRE_DURATION_MS = 24 * 60 * 60 * 1000; // 시연을 위해 24시간, 원래는 5분
+    private static final long EXPIRE_DURATION_MS = 24 * 60 * 60 * 1000; // 시연을 위해 24시간으로 토큰 만료 시간 설정
 
     public String generate(Long bookId) {
 
