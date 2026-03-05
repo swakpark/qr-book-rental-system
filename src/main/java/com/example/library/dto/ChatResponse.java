@@ -1,5 +1,8 @@
 package com.example.library.dto;
 
+import lombok.Getter;
+
+@Getter
 public class ChatResponse {
 
     private String reply;
@@ -12,7 +15,4 @@ public class ChatResponse {
         return new ChatResponse(reply);
     }
 
-    public String getReply() {
-        return reply;
-    }
 }

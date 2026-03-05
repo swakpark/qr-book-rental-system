@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>도서 상세</title>
+    <link rel="stylesheet" th:href="@{/css/common.css}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <div class="page-header">
+            <a th:href="@{/books/search-page}" class="back-link">⬅️ 도서 검색</a>
+        </div>
+        <h2 th:text="${book.title}"></h2>
+        <p th:text="${book.author}"></p>
+
+        <p>
+            분류:
+            <span th:text="${currentZone.code}"></span>
+            -
+            <span th:text="${currentZone.name}"></span>
+            ( <span th:text="${currentZone.floor}"></span>층 )
+
+            <br>
+
+            <span th:text="${book.shelf.code}"></span> 서가
+            ( <span th:text="${book.shelfLevelName}"></span> )
+
+            <span th:if="${book.shelf == null}">
+                미지정
+            </span>
+        </p>
+
+        <hr>
+
+        <h3>📍 위치 안내</h3>
+
+        <div class="map-instruction">
+            <span class="main-text">🎯 구역(기술과학, 예술 등)을 터치해 보세요!</span>
+            <span class="sub-text">해당 서가에 있는 다른 도서 목록을 바로 확인할 수 있습니다.</span>
+        </div>
+
+        <div class="floor-tabs">
+            <button th:classappend="${currentZone.floor == 1} ? 'active-floor' : ''"
+                    onclick="changeFloor(1)">1층
+            </button>
+
+            <button th:classappend="${currentZone.floor == 2} ? 'active-floor' : ''"
+                    onclick="changeFloor(2)">2층
+            </button>
+        </div>
+
+        <div class="map-wrapper">
+
+            <!-- 1층 -->
+            <svg id="floor1" viewBox="0 0 100 100"
+                 th:classappend="${currentZone.floor != 1} ? 'hidden-floor' : ''">
+
+                <!-- 외곽 -->
+                <rect x="0" y="0" width="100" height="100" rx="6" fill="#f8fafc" stroke="#d1d5db" stroke-width="0.6"/>
+
+                <!-- 화장실 (좌측 상단) -->
+                <rect x="5" y="5" width="20" height="12" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.5"/>
+                <text x="15" y="12" text-anchor="middle" font-size="3.5">화장실</text>
+
+                <!-- 카운터 (중앙 상단) -->
+                <rect x="40" y="5" width="25" height="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="0.5"/>
+                <text x="52.5" y="11.5" text-anchor="middle" font-size="3.5">카운터</text>
+
+                <!-- 커뮤니티 라운지 (중앙 메인 - 000~400이 이 안에 들어감) -->
+                <rect x="25" y="18" width="55" height="55" fill="#fef3c7" stroke="#fcd34d" stroke-width="0.6"/>
+                <text x="52.5" y="45" text-anchor="middle" font-size="5" fill="#d97706" opacity="0.3">라운지</text>
+
+                <!-- 어린이 자료실 (우측 세로) -->
+                <rect x="80.5" y="18" width="15" height="55" fill="#fde2e4" stroke="#fda4af" stroke-width="0.6"/>
+                <text x="87.5" y="46" fill="#166534" text-anchor="middle" font-size="4" writing-mode="vertical-rl">어린이실</text>
+
+                <!-- 입구/로비 (중앙 하단) -->
+                <rect x="40" y="77.5" width="25" height="15" fill="#e0f2fe" stroke="#7dd3fc" stroke-width="0.6"/>
+                <text x="52.5" y="86" fill="#0369a1" text-anchor="middle" font-size="4">입구/로비</text>
+
+                <!-- Zone 배치 -->
+                <g th:each="zone : ${zonesFloor1}">
+                    <rect
+                        th:attr="
+                            x=${anchorX + zone.offsetX},
+                            y=${anchorY + zone.offsetY},
+                            width=${zone.width},
+                            height=${zone.height},
+                            onclick=|loadZoneBooks(${zone.id})|"
+                        th:classappend="${zone.code == 'STAIRS'} ? ' stairs-zone' : ''"
+                        class="zone-rect"/>
+
+                    <text
+                        th:attr="
+                            x=${anchorX + zone.offsetX + zone.width / 2},
+                            y=${anchorY + zone.offsetY + zone.height / 2}"
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                        class="zone-label"
+                        th:text="${zone.name}">
+                    </text>
+
+                </g>
+
+                <g th:if="${currentZone.floor == 1}"
+                   th:with="
+                        startX=52.5,
+                        startY=78,
+                        endX=${anchorX + currentZone.offsetX + (currentZone.width / 2)},
+                        endY=${anchorY + currentZone.offsetY + (currentZone.height / 2) + 4}
+                   ">
+
+                    <!-- 현재 위치 -->
+                    <circle th:attr="cx=${startX}, cy=${startY}"
+                            r="2.4"
+                            fill="#ef4444"
+                            stroke="white"
+                            stroke-width="1.5"
+                            class="current-location"/>
+
+                    <!-- 도착 지점 -->
+                    <circle th:attr="cx=${endX}, cy=${endY}"
+                            r="3"
+                            fill="#ef4444"
+                            opacity="0.8"/>
+
+                    <!-- 이동 경로 (완전 자동 L자) -->
+                    <polyline
+                            th:attr="points=|
+                                ${startX},${startY}
+                                ${endX},${startY}
+                                ${endX},${endY}
+                            |"
+                            fill="none"
+                            stroke="#ef4444"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="route-line"/>
+                </g>
+
+            </svg>
+
+            <!-- 2층 -->
+            <svg id="floor2" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"
+                 th:classappend="${currentZone.floor != 2} ? 'hidden-floor' : ''">
+
+                <!-- 외곽 -->
+                <rect x="0" y="0" width="100" height="100"
+                      rx="6"
+                      fill="#f8fafc"
+                      stroke="#d1d5db"
+                      stroke-width="0.6"/>
+
+                <!-- 화장실 (좌측 상단) -->
+                <rect x="5" y="5" width="20" height="12"
+                      fill="#f1f5f9"
+                      stroke="#cbd5e1"
+                      stroke-width="0.5"/>
+                <text x="15" y="12"
+                      text-anchor="middle"
+                      font-size="3.5">화장실</text>
+
+                <!-- 테라스 (중앙 상단) -->
+                <rect x="39" y="5" width="30" height="10"
+                      fill="#dcfce7"
+                      stroke="#86efac"
+                      stroke-width="0.6"/>
+                <text x="54" y="11"
+                      text-anchor="middle"
+                      font-size="3.5"
+                      fill="#166534">테라스</text>
+
+                <!-- 집중석 (우측 세로) -->
+                <rect x="80.5" y="18" width="15" height="55"
+                      fill="#e0f2fe"
+                      stroke="#7dd3fc"
+                      stroke-width="0.6"/>
+                <text x="88" y="46"
+                      text-anchor="middle"
+                      font-size="4"
+                      fill="#0369a1">집중석</text>
+
+                <!-- 종합 자료실 영역 (중앙 메인 - 500~900이 이 안에 들어감) -->
+                <rect x="25" y="18" width="55" height="55"
+                      fill="#fef3c7"
+                      stroke="#fcd34d"
+                      stroke-width="0.6"/>
+                <text x="52.5" y="47"
+                      text-anchor="middle"
+                      font-size="5"
+                      fill="#92400e"
+                      opacity="0.3">종합 자료실</text>
+
+                <!-- 테라스 (중앙 하단) -->
+                <rect x="40" y="81" width="30" height="10"
+                      fill="#dcfce7"
+                      stroke="#86efac"
+                      stroke-width="0.6"/>
+                <text x="55" y="87"
+                      text-anchor="middle"
+                      font-size="3.5"
+                      fill="#166534">테라스</text>
+
+                <!-- 다목적실 (우측 하단) -->
+                <rect x="75" y="79" width="20" height="12"
+                      fill="#fef3c7"
+                      stroke="#fcd34d"
+                      stroke-width="0.6"/>
+                <text x="85" y="86"
+                      text-anchor="middle"
+                      font-size="3.5"
+                      fill="#92400e">다목적실</text>
+
+                <!-- Zone 배치 -->
+                <g th:each="zone : ${zonesFloor2}">
+                    <rect
+                        th:attr="
+                            x=${anchorX + zone.offsetX},
+                            y=${anchorY + zone.offsetY},
+                            width=${zone.width},
+                            height=${zone.height},
+                            onclick=|loadZoneBooks(${zone.id})|"
+                        th:classappend="${zone.code == 'STAIRS'} ? ' stairs-zone' : ''"
+                        class="zone-rect"/>
+
+                    <text
+                        th:attr="
+                            x=${anchorX + zone.offsetX + zone.width / 2},
+                            y=${anchorY + zone.offsetY + zone.height / 2}"
+                        text-anchor="middle"
+                        dominant-baseline="middle"
+                        class="zone-label"
+                        th:text="${zone.name}">
+                    </text>
+
+                </g>
+
+                <g th:if="${currentZone.floor == 2}"
+                   th:with="
+                        startX=${anchorX + stairs.offsetX + (stairs.width / 2)},
+                        startY=${anchorY + stairs.offsetY + (stairs.height / 2) - 6},
+                        endX=${anchorX + currentZone.offsetX + (currentZone.width / 2)},
+                        endY=${anchorY + currentZone.offsetY + (currentZone.height / 2) + 4}
+                    ">
+
+                    <!-- 현재 위치 -->
+                    <circle th:attr="cx=${startX}, cy=${startY}"
+                            r="2.4"
+                            fill="#ef4444"
+                            stroke="white"
+                            stroke-width="1.5"
+                            class="current-location"/>
+
+                    <!-- 도착 지점 -->
+                    <circle th:attr="cx=${endX}, cy=${endY}"
+                            r="3"
+                            fill="#ef4444"
+                            opacity="0.8"/>
+
+                    <!-- 이동 경로 (완전 자동 L자) -->
+                    <polyline
+                            th:attr="points=|
+                                ${startX},${startY}
+                                ${endX},${startY}
+                                ${endX},${endY}
+                            |"
+                            fill="none"
+                            stroke="#ef4444"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="route-line"/>
+                </g>
+
+            </svg>
+
+            <div class="filter-row">
+                <input type="checkbox" id="availableFilter">
+                <label for="availableFilter">대여 가능 도서만 보기</label>
+            </div>
+
+            <div id="zone-book-panel" class="zone-book-panel">
+                <h3>📖 구역 도서 목록</h3>
+                <ul id="zone-book-list"></ul>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    function changeFloor(floor) {
+    const floor1 = document.getElementById("floor1");
+    const floor2 = document.getElementById("floor2");
+
+    if (floor === 1) {
+        floor1.classList.remove("hidden-floor");
+        floor2.classList.add("hidden-floor");
+    } else {
+        floor2.classList.remove("hidden-floor");
+        floor1.classList.add("hidden-floor");
+    }
+
+    // 버튼 active 스타일도 업데이트
+    document.querySelectorAll(".floor-tabs button")
+        .forEach(btn => btn.classList.remove("active-floor"));
+
+    event.target.classList.add("active-floor");
+}
+
+let currentZoneId = null;
+
+function loadZoneBooks(zoneId) {
+
+    currentZoneId = zoneId;
+
+    fetch(`/books/zones/${zoneId}`)
+        .then(res => res.json())
+        .then(data => {
+
+            const list = document.getElementById("zone-book-list");
+            const filter = document.getElementById("availableFilter");
+
+            list.innerHTML = "";
+
+            // 대출 필터 적용
+            if (filter.checked) {
+                data = data.filter(book => book.available);
+            }
+
+            if (data.length === 0) {
+                list.innerHTML = "<p>조건에 맞는 도서가 없습니다.</p>";
+                return;
+            }
+
+            // 1. 서가 기준 그룹화
+            const grouped = {};
+
+            data.forEach(book => {
+                const shelf = book.shelfCode || "미지정";
+                if (!grouped[shelf]) {
+                    grouped[shelf] = [];
+                }
+                grouped[shelf].push(book);
+            });
+
+            // 2. 서가 정렬
+            Object.keys(grouped).sort().forEach(shelfCode => {
+
+                const shelfSection = document.createElement("div");
+                shelfSection.className = "shelf-section";
+
+                shelfSection.innerHTML = `
+                    <h4 class="shelf-title">
+                        📚 ${shelfCode} 서가 (${shelfCounts[shelfCode] ?? 0}권)
+                    </h4>
+                `;
+
+                // 단 기준 정렬
+                grouped[shelfCode].sort((a, b) => a.shelfLevel - b.shelfLevel);
+
+                const grid = document.createElement("div");
+                grid.className = "book-grid";
+
+                grouped[shelfCode].forEach(book => {
+
+                    const card = document.createElement("div");
+                    card.className = "zone-book-card";
+
+                    card.innerHTML = `
+                        <div class="book-card">
+                            <a href="/books/${book.id}">
+                                <img src="${book.image}" class="card-thumb"/>
+                            </a>
+                            <div class="card-body">
+                                <div class="card-title">${book.title}</div>
+                                <div class="card-author">${book.author}</div>
+                                <div class="card-location">
+                                    📍 ${shelfCode} 서가 (${getShelfLevelName(book.shelfLevel)})
+                                </div>
+                                <div class="card-status ${book.available ? 'available' : 'unavailable'}">
+                                    ${book.available ? '🟢 대여 가능' : '🔴 대여 중'}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    grid.appendChild(card);
+                });
+
+                shelfSection.appendChild(grid);
+                list.appendChild(shelfSection);
+            });
+        });
+}
+
+// 단 이름 변환 메서드
+function getShelfLevelName(level) {
+    switch(level) {
+        case 1: return "하단";
+        case 2: return "중하단";
+        case 3: return "중상단";
+        case 4: return "상단";
+        default: return "";
+    }
+}
+
+// 필터 변경 시 다시 로드
+document.getElementById("availableFilter")
+    .addEventListener("change", () => {
+        if (currentZoneId !== null) {
+            loadZoneBooks(currentZoneId);
+        }
+    });
+</script>
+
+<script th:inline="javascript">
+    const shelfCounts = [[${shelfCounts}]];
+</script>
+
+</body>
+</html>

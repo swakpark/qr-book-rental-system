@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>도서 검색</title>
+    <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+
+        <div class="search-header">
+            <h1>도서 검색</h1>
+            <a th:href="@{/qr/entry}" class="back-link">⬅️ 홈 화면</a>
+        </div>
+
+        <!-- 검색 폼 -->
+        <form th:action="@{/books/search}" method="get" class="search-form">
+            <input type="text"
+                   name="keyword"
+                   th:value="${param.keyword}"
+                   placeholder="도서 제목을 입력해주세요."
+                   required>
+            <button type="submit" class="btn-primary">
+                검색
+            </button>
+        </form>
+
+        <!-- 검색 결과 없음 -->
+        <div th:if="${param.keyword != null and (books == null or #lists.isEmpty(books))}" class="result-empty">
+            <div class="icon">📚</div>
+            <p>검색 결과가 없습니다.</p>
+            <p class="muted">다른 키워드로 검색해보세요.</p>
+        </div>
+
+        <!-- 검색 결과 있음 -->
+        <div th:if="${books != null and !#lists.isEmpty(books)}">
+
+            <div class="result-count">
+                <span th:text="${#lists.size(books)} + '권 검색됨'"></span>
+            </div>
+
+            <div class="book-grid">
+
+                <div class="zone-book-card" th:each="book : ${books}">
+                    <div class="book-card">
+
+                        <a th:href="@{/books/{id}(id=${book.id})}">
+                            <img th:src="${book.image}"
+                                 alt="도서 이미지"
+                                 class="card-thumb"/>
+                        </a>
+
+                        <div class="card-body">
+                            <div class="card-title"
+                                 th:text="${book.title}"></div>
+
+                            <div class="card-author"
+                                 th:text="${book.author}"></div>
+
+                            <div class="isbn"
+                                 th:text="'ISBN: ' + ${book.isbn}"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,75 +1,48 @@
 package com.example.library.qr;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.apache.commons.codec.digest.DigestUtils;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 @Component
 public class QrTokenValidator {
 
-    private static final String SECRET_KEY = "qr-secret-key";
+    @Value("${qr.secret}")
+    private String secretKey;
 
-    public void validate(String token, Long bookId) {
-        if (token == null || token.isBlank()) {
-            throw new IllegalArgumentException("QR 토큰이 없습니다.");
+    private static final String HMAC_ALGO = "HmacSHA256";
+
+    public void validate(Long bookId, String signature) {
+
+        if (signature == null || signature.isBlank()) {
+            throw new IllegalArgumentException("QR 서명이 없습니다.");
         }
 
-        DecodedToken decoded = decode(token);
+        String expected = generateSignature(bookId);
 
-        validateBookId(decoded, bookId);
-        validateExpiration(decoded);
-        validateSignature(decoded);
+        if (!expected.equals(signature)) {
+            throw new IllegalArgumentException("QR 서명이 유효하지 않습니다.");
+        }
     }
 
-    private static DecodedToken decode(String token) {
+    private String generateSignature(Long bookId) {
         try {
-            String decoded = new String(Base64.getDecoder().decode(token));
-            String[] parts = decoded.split(":");
+            String data = String.valueOf(bookId);
 
-            Long decodedBookId = Long.parseLong(parts[0]);
-            long issuedAt = Long.parseLong(parts[1]);
-            long expiresAt = Long.parseLong(parts[2]);
-            String signature = parts[3];
+            Mac mac = Mac.getInstance(HMAC_ALGO);
+            SecretKeySpec keySpec = new SecretKeySpec(secretKey.getBytes(), HMAC_ALGO);
 
-            return new DecodedToken(decodedBookId, issuedAt, expiresAt, signature);
+            mac.init(keySpec);
+
+            byte[] hmacBytes = mac.doFinal(data.getBytes());
+
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hmacBytes);
 
         } catch (Exception e) {
-            throw new IllegalArgumentException("QR 토큰 형식이 올바르지 않습니다.");
+            throw new RuntimeException("QR HMAC 검증 실패", e);
         }
-    }
-
-    // URL 조작 방지
-    private void validateBookId(DecodedToken decoded, Long bookId) {
-        if (!decoded.getBookId().equals(bookId)) {
-            throw new IllegalArgumentException("QR 토큰과 도서 정보가 일치하지 않습니다.");
-        }
-    }
-
-    // 캡쳐 QR / 재사용 공격 방지
-    private void validateExpiration(DecodedToken decoded) {
-        long now = System.currentTimeMillis();
-
-        if (now > decoded.getExpiresAt()) {
-            throw new IllegalArgumentException("QR 토큰이 만료되었습니다.");
-        }
-    }
-
-    // QR URL 위조 방지
-    private void validateSignature(DecodedToken decoded) {
-        String expected = generateSignature(
-                decoded.getBookId(),
-                decoded.getIssuedAt(),
-                decoded.getExpiresAt()
-        );
-
-        if (!expected.equals(decoded.getSignature())) {
-            throw new IllegalArgumentException("QR 토큰 서명이 유효하지 않습니다.");
-        }
-    }
-
-    private String generateSignature(long bookId, long issuedAt, long expiresAt) {
-        String data = bookId + ":" + issuedAt + ":" + expiresAt + ":" + SECRET_KEY;
-        return DigestUtils.sha256Hex(data);
     }
 }

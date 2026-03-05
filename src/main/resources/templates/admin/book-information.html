@@ -2,67 +2,77 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>도서 정보</title>
-    <style>
-        .page-header {
-            position: sticky;
-            top: 0;
-            background: #ffffff;
-            z-index: 100;
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .back-btn {
-            text-decoration: none;
-            font-size: 14px;
-            color: #2563eb;
-            font-weight: bold;
-        }
-        .page-header h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
 </head>
+
 <body>
 
-<div class="page-header">
-    <h2>도서 정보</h2>
-    <a th:href="@{/admin/view/loans}" class="back-btn">← 도서 대여 목록</a>
+<div class="admin-container">
+
+    <!-- 헤더 -->
+    <div class="admin-header">
+        <h1>📘 도서 정보</h1>
+        <a th:href="@{/admin/view/loans}" class="btn-gray small">
+            ← 도서 대여 목록
+        </a>
+    </div>
+
+    <!-- 도서 기본 정보 -->
+    <div class="card">
+
+        <div class="admin-book-title" th:text="${book.title}"></div>
+
+        <div class="muted">
+            저자: <span th:text="${book.author}"></span>
+        </div>
+
+        <div class="muted">
+            대여 가능:
+            <span th:text="${book.available ? '가능' : '불가'}"></span>
+        </div>
+
+    </div>
+
+    <!-- QR 코드 -->
+    <div class="card qr-card">
+
+        <div class="section-title">📱 QR 코드로 바로 열기</div>
+
+        <img class="qr-image"
+             th:src="@{'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + ${qrUrl}}"
+             alt="도서 QR 코드" />
+
+        <div class="muted small-text">
+            QR을 스캔하면 이 도서 페이지로 이동합니다.
+        </div>
+
+    </div>
+
+    <!-- 대여 상태 -->
+    <div th:if="${loan != null}" class="card">
+
+        <div class="section-title">📦 대여 상태</div>
+
+        <div class="admin-loan-user">
+            👤 대여자:
+            <span th:text="${loan.user.name}"></span>
+        </div>
+
+        <form th:action="@{/admin/books/{id}/force-return(id=${book.id})}"
+              method="post"
+              class="admin-action-form">
+
+            <button type="submit" class="btn-danger">
+                관리자 강제 반납
+            </button>
+
+        </form>
+
+    </div>
+
 </div>
-
-<p>제목: <span th:text="${book.title}"></span></p>
-<p>저자: <span th:text="${book.author}"></span></p>
-<p>대여 가능: <span th:text="${book.available}"></span></p>
-
-<h3>📱 QR 코드로 바로 열기</h3>
-
-<img
-    th:src="@{'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + ${qrUrl}}"
-    alt="도서 QR 코드"
-/>
-
-<p>QR을 스캔하면 이 도서 페이지로 이동합니다.</p>
-
-<hr>
-
-<!-- 대여 중일 때 -->
-<div th:if="${loan != null}">
-    <p><strong>대여 상태:</strong> 대여 중 </p>
-    <p><strong>대여자:</strong>
-        <span th:text="${loan.user.name}"></span>
-    </p>
-
-    <!-- 관리자 강제 반납 -->
-    <form th:action="@{/admin/books/{id}/force-return(id=${book.id})}" method="post">
-        <button type="submit">관리자 강제 반납</button>
-    </form>
-</div>
-
-<hr>
 
 </body>
 </html>

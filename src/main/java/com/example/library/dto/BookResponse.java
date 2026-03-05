@@ -1,7 +1,9 @@
 package com.example.library.dto;
 
 import com.example.library.model.Book;
+import lombok.Getter;
 
+@Getter
 public class BookResponse {
 
     private Long id;
@@ -23,22 +25,5 @@ public class BookResponse {
                 book.getAuthor(),
                 book.isAvailable()
         );
-    }
-
-    // Getter
-    public Long getId() {
-        return id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public boolean isAvailable() {
-        return available;
     }
 }

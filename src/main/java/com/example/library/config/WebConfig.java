@@ -16,11 +16,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        // QR 토큰 인터셉터
         registry.addInterceptor(qrTokenInterceptor)
                 .addPathPatterns("/qr/books/*") // QR Book만 가로챔
                 .excludePathPatterns(
                         "/qr/books/*/loan/**",
                         "/qr/books/*/return/**"
                 );
+
     }
+
 }

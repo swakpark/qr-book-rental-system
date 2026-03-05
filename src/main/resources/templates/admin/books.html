@@ -2,52 +2,56 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>관리자 도서 목록</title>
-    <style>
-        body { font-family: system-ui; background:#f5f6f8; padding:20px; }
-        .wrap { max-width:900px; margin:0 auto; }
-        table { width:100%; border-collapse:collapse; background:#fff; }
-        th, td { padding:12px; border-bottom:1px solid #eee; }
-        th { background:#f1f5f9; text-align:left; }
-        .available { color:#16a34a; font-weight:600; }
-        .borrowed { color:#dc2626; font-weight:600; }
-        .top { display:flex; justify-content:space-between; margin-bottom:12px; }
-        a.btn { padding:8px 12px; background:#2563eb; color:#fff; text-decoration:none; border-radius:6px; }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
 </head>
-<body>
-<div class="wrap">
 
-    <div class="top">
-        <h2>📚 관리자 도서 목록</h2>
-        <a th:href="@{/admin/books/naver}" class="btn">➕ 네이버 도서 등록</a>
+<body>
+<div class="admin-container">
+
+    <!-- 헤더 -->
+    <div class="admin-header">
+        <h1>📚 관리자 도서 목록</h1>
+        <a th:href="@{/admin/books/naver}" class="btn-primary small">
+            ➕ 네이버 도서 등록
+        </a>
     </div>
 
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>제목</th>
-            <th>저자</th>
-            <th>출판사</th>
-            <th>ISBN</th>
-            <th>상태</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="book : ${books}">
-            <td th:text="${book.id}"></td>
-            <td th:text="${book.title}"></td>
-            <td th:text="${book.author}"></td>
-            <td th:text="${book.publisher}"></td>
-            <td th:text="${book.isbn}"></td>
-            <td>
-                <span th:if="${book.available}" class="available">대여 가능</span>
-                <span th:if="${!book.available}" class="borrowed">대여 중</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <!-- 도서 없음 -->
+    <div th:if="${#lists.isEmpty(books)}" class="admin-empty">
+        등록된 도서가 없습니다.
+    </div>
+
+    <!-- 도서 목록 -->
+    <div class="admin-list">
+
+        <div th:each="book : ${books}" class="admin-row">
+
+            <div class="admin-row-title">
+                📖 <span th:text="${book.title}"></span>
+            </div>
+
+            <div class="admin-row-user">
+                👤 <span th:text="${book.author}"></span>
+            </div>
+
+            <div class="admin-row-user">
+                🏢 <span th:text="${book.publisher}"></span>
+            </div>
+
+            <div class="admin-row-user">
+                ISBN: <span th:text="${book.isbn}"></span>
+            </div>
+
+            <div class="admin-row-status"
+                 th:text="${book.available ? '대여 가능' : '대여 중'}"
+                 th:classappend="${book.available} ? ' done' : ' active'">
+            </div>
+
+        </div>
+
+    </div>
 
 </div>
 </body>

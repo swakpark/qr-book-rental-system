@@ -1,12 +1,14 @@
 package com.example.library.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "inquiry")
-public class
-Inquiry {
+public class Inquiry {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -81,51 +83,7 @@ Inquiry {
         }
     }
 
-    // Getter
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public boolean isOverdue() {
-        return overdue;
-    }
-
-    public int getOverdueDays() {
-        return overdueDays;
-    }
-
-    public int getPenaltyAmount() {
-        return penaltyAmount;
-    }
-
-    public boolean isResolved() {
-        return resolved;
-    }
-
-    public LocalDateTime getResolvedAt() {
-        return resolvedAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getAdminReply() {
-        return adminReply;
-    }
-
-    public boolean isUserChecked() {
-        return userChecked;
-    }
-
+    // Setter
     public void setUserChecked(boolean userChecked) {
         this.userChecked = userChecked;
     }

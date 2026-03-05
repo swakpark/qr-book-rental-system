@@ -2,7 +2,9 @@ package com.example.library.dto;
 
 import com.example.library.model.Role;
 import com.example.library.model.User;
+import lombok.Getter;
 
+@Getter
 public class UserResponse {
 
     private Long id;
@@ -24,22 +26,5 @@ public class UserResponse {
                 user.getEmail(),
                 user.getRole()
         );
-    }
-
-    // Getter
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Role getRole() {
-        return role;
     }
 }

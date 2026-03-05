@@ -18,21 +18,24 @@ public class QrBookResultController {
     }
 
     // 대여 완료 화면
-    @GetMapping("/{id}/loan/result")
-    public String loanResult(@PathVariable Long id, Model model) {
-        model.addAttribute("book", bookService.getBook(id));
+    @GetMapping("/{bookId}/{signature}/loan/result")
+    public String loanResult(@PathVariable Long bookId, @PathVariable String signature, Model model) {
+        model.addAttribute("book", bookService.getBook(bookId));
         model.addAttribute("message", "📘 대여 완료");
+        model.addAttribute("signature", signature);
         model.addAttribute("autoRedirect", true);
 
         return "qr/qr-result";
     }
 
     // 반납 완료 화면
-    @GetMapping("/{id}/return/result")
-    public String returnResult(@PathVariable Long id, Model model) {
-        model.addAttribute("book", bookService.getBook(id));
+    @GetMapping("/{bookId}/{signature}/return/result")
+    public String returnResult(@PathVariable Long bookId, @PathVariable String signature, Model model) {
+        model.addAttribute("book", bookService.getBook(bookId));
         model.addAttribute("message", "📕 반납 완료");
+        model.addAttribute("signature", signature);
         model.addAttribute("autoRedirect", true);
+
 
         return "qr/qr-result";
     }

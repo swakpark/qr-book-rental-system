@@ -6,6 +6,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.HandlerMapping;
+
+import java.util.Map;
 
 @Component
 public class QrTokenInterceptor implements HandlerInterceptor {
@@ -21,20 +24,26 @@ public class QrTokenInterceptor implements HandlerInterceptor {
 
         String path = request.getRequestURI(); // /qr/books/{id}
 
-        // QR 접근 페이지가 아니면 통과
-        if (!path.matches("/qr/books/\\d+")) {
+        // QR 책 상세 경로만 검사
+        if (!path.startsWith("^/qr/books/\\\\d+/[^/]+$")) {
             return true;
         }
 
-        String token = request.getParameter("token");
-
         try {
-            // 1. URL 경로에서 bookId 추출 (예: /qr/books/123 -> 123)
-            String[] pathParts = path.split("/");
-            Long bookId = Long.parseLong(pathParts[pathParts.length - 1]);
+            // PathVariable 가져오기
+            Map<String, String> pathVariables =
+                    (Map<String, String>) request.getAttribute(
+                            HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE
+                    );
 
-            // 2. validator의 validate 메서드 호출 (isValid가 아님)
-            qrTokenValidator.validate(token, bookId);
+            if (pathVariables == null) {
+                return true;
+            }
+
+            Long bookId = Long.valueOf(pathVariables.get("bookId"));
+            String signature = pathVariables.get("signature");
+
+            qrTokenValidator.validate(bookId, signature);
 
             return true; // 검증 성공 시 통과
         } catch (Exception e) {

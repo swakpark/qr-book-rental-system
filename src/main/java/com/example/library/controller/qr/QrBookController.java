@@ -22,31 +22,31 @@ public class QrBookController {
     }
 
     // 도서 대여
-    @PostMapping("/{id}/loan")
-    public String loanBook(@PathVariable Long id, @RequestParam String token) {
+    @PostMapping("/{bookId}/{signature}/loan")
+    public String loanBook(@PathVariable Long bookId, @PathVariable String signature) {
 
         if (!AuthUtil.isLoggedIn()) {
-            return "redirect:/login?redirect=/qr/books/" + id + "?token=" + token;
+            return "redirect:/login?redirect=/qr/books/" + bookId + "/" + signature;
         }
 
         User user = userService.getUserByEmail(AuthUtil.getEmail());
-        loanService.loanBook(user, id);
+        loanService.loanBook(user, bookId);
 
-        return "redirect:/qr/books/" + id + "/loan/result?token=" + token;
+        return "redirect:/qr/books/" + bookId + "/" + signature + "/loan/result";
     }
 
     // 도서 반납
-    @PostMapping("/{id}/return")
-    public String returnBook(@PathVariable Long id, @RequestParam String token) {
+    @PostMapping("/{bookId}/{signature}/return")
+    public String returnBook(@PathVariable Long bookId, @PathVariable String signature) {
 
         if (!AuthUtil.isLoggedIn()) {
-            return "redirect:/login?redirect=/qr/books/" + id + "?token=" + token;
+            return "redirect:/login?redirect=/qr/books/" + bookId + "/" + signature;
         }
 
         User user = userService.getUserByEmail(AuthUtil.getEmail());
-        loanService.returnBook(user, id);
+        loanService.returnBook(user, bookId);
 
-        return "redirect:/qr/books/" + id + "/return/result?token=" + token;
+        return "redirect:/qr/books/" + bookId + "/" + signature + "/return/result";
     }
 }
 

@@ -47,11 +47,13 @@ public class QrLoanController {
                             Long bookId = (loan.getBook() != null) ? loan.getBook().getId() : 0L;
                             String title = (loan.getBook() != null) ? loan.getBook().getTitle() : "제목 없음";
                             String author = (loan.getBook() != null) ? loan.getBook().getAuthor() : "저자 없음";
+                            String image = (loan.getBook() != null) ? loan.getBook().getImage() : "이미지 없음";
 
                             return new LoanView(
                                     bookId,
                                     title,
                                     author,
+                                    image,
                                     dueDate,
                                     daysLeft
                             );
@@ -68,14 +70,16 @@ public class QrLoanController {
         private final Long bookId;
         private final String title;
         private final String author;
+        private final String image;
         private final LocalDate dueDate;
         private final long daysLeft;
 
-        public LoanView(Long bookId, String title, String author,
+        public LoanView(Long bookId, String title, String author, String image,
                         LocalDate dueDate, long daysLeft) {
             this.bookId = bookId;
             this.title = title;
             this.author = author;
+            this.image = image;
             this.dueDate = dueDate;
             this.daysLeft = daysLeft;
         }
@@ -83,6 +87,9 @@ public class QrLoanController {
         public Long getBookId() { return bookId; }
         public String getTitle() { return title; }
         public String getAuthor() { return author; }
+        public String getImage() {
+            return image;
+        }
         public LocalDate getDueDate() { return dueDate; }
         public long getDaysLeft() { return daysLeft; }
     }

@@ -1,8 +1,10 @@
 package com.example.library.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "users") // 테이블명 명시
 public class User {
 
@@ -44,27 +46,6 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = role;
-    }
-
-    // Getter
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Role getRole() {
-        return role;
     }
 
     // 편의 메서드

@@ -4,126 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>도서관 서비스</title>
-    <style>
-        body{font-family:system-ui,-apple-system,BlinkMacSystemFont;background:#f5f6f8;margin:0;padding:20px;}
-        .wrap{max-width:420px;margin:0 auto;}
-        .card{background:#fff;border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.06);}
-        h1{font-size:20px;margin:0 0 8px;}
-        .muted{color:#666;font-size:14px;}
-        .btn{display:block;width:100%;padding:14px 16px;border-radius:12px;border:0;font-size:16px;margin-top:10px;cursor:pointer;}
-        .primary{background:#2563eb;color:#fff;}
-        .gray{background:#eef2ff;color:#1e3a8a;}
-        .outline{background:#fff;border:1px solid #d1d5db;color:#374151}
-        .loan{padding:10px 0;border-top:1px solid #eee;}
-        a{text-decoration:none;}
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
 </head>
-<body>
-<div class="wrap">
 
+<body>
+<div class="container">
+
+    <!-- 상단 + 메뉴 통합 카드 -->
     <div class="card">
+
+        <!-- 타이틀 -->
         <h1>🏛️ 도서관 서비스</h1>
 
-        <!-- 로그인/비로그인 안내 문구 통일 -->
         <div class="muted">
             <span th:if="${user != null}">
-                (현재 사용자: <b th:text="${user.name}">사용자</b>)
+                현재 사용자: <b th:text="${user.name}">사용자</b>
             </span>
             <span th:if="${user == null}">
-                (로그인 후 기능을 이용할 수 있어요)
+                로그인 후 기능을 이용할 수 있어요!
             </span>
         </div>
 
-        <!-- 로그인 상태: 로그아웃만 -->
-        <div th:if="${user != null}">
+        <!-- 관리자 링크 -->
+        <a th:if="${isAdmin}"
+           th:href="@{/admin/dashboard}"
+           class="admin-link">
+            🛠 관리자 페이지
+        </a>
+
+        <!-- 로그인 상태 -->
+        <div th:if="${user != null}" style="margin-top:16px;">
             <form action="/logout" method="post">
-                <button type="submit" class="btn outline">로그아웃</button>
+                <button type="submit" class="btn-outline">로그아웃</button>
             </form>
         </div>
 
-        <!-- 비로그인 상태: 로그인/회원가입 -->
-        <div th:if="${user == null}">
-            <a th:href="@{/login}">
-                <button type="button" class="btn primary">로그인</button>
-            </a>
-            <a th:href="@{/register}">
-                <button type="button" class="btn outline">회원가입</button>
-            </a>
+        <!-- 비로그인 상태 -->
+        <div th:if="${user == null}" class="entry-auth">
+            <a th:href="@{/login}" class="btn-outline small">로그인</a>
+            <a th:href="@{/register}" class="btn-outline small">회원가입</a>
         </div>
 
-        <a th:if="${isAdmin}"
-           th:href="@{/admin/dashboard}"
-           style="
-             position: fixed;
-             top: 20px;
-             right: 20px;
-             font-size: 28px;
-             text-decoration: none;
-           "
-           title="관리자 페이지"
-        >
-            🛠
-        </a>
+        <!-- 주요 기능 -->
+        <div class="menu-grid">
+            <a th:href="@{/books/search-page}" class="menu-card">
+                <div class="menu-icon">🔍</div>
+                <div class="menu-title">도서 검색</div>
+            </a>
 
+            <a th:href="@{/chat}" class="menu-card">
+                <div class="menu-icon">🤖</div>
+                <div class="menu-title">도서관 챗봇</div>
+            </a>
 
-        <!-- 공통 기능 -->
-        <a th:href="@{/chat}">
-            <button type="button" class="btn primary">🤖 챗봇 이용하기</button>
-        </a>
+            <!-- 보조 기능 -->
+            <a th:href="@{/qr/loans}" class="menu-card">
+                <div class="menu-icon">📄</div>
+                <div class="menu-title">대여 목록</div>
+            </a>
 
-        <a th:href="@{/qr/loans}">
-            <button type="button" class="btn gray">📄 대여 목록 보기</button>
-        </a>
+            <a th:href="@{/help}" class="menu-card">
+                <div class="menu-icon">👤</div>
+                <div class="menu-title">관리자 문의</div>
+            </a>
 
-        <a th:href="@{/help}">
-            <button type="button" class="btn outline">🧑‍💼 관리자 문의</button>
-        </a>
-
-        <div class="muted" style="margin-top:10px;">
-            ※ 실제 “대여/반납”은 책에 붙은 QR로 진행됩니다.
         </div>
+
+        <div class="footer">
+            📌 실제 대여/반납은 도서에 부착된 QR로 진행됩니다.
+        </div>
+
     </div>
 
-    <!-- 로그인한 사용자에게만: 내 대여 현황 -->
+    <!-- 로그인 사용자 전용: 내 대여 현황 -->
     <div class="card" th:if="${user != null}">
-        <h1 style="font-size:16px;">📌 내 대여 현황</h1>
+        <h2>📌 내 대여 현황</h2>
 
         <div th:if="${#lists.isEmpty(loanViews)}" class="muted">
             현재 대여 중인 도서가 없습니다.
         </div>
 
         <div th:if="${!#lists.isEmpty(loanViews)}">
+
             <div class="muted">
                 현재 <b th:text="${#lists.size(loanViews)}"></b>권 대여 중입니다.
             </div>
 
-            <div th:each="loan, iter : ${loanViews}" th:if="${iter.index < 2}">
-                <div class="loan">
-                    • <span th:text="${loan.title}"></span>
-                </div>
+            <div th:each="loan, iter : ${loanViews}"
+                 th:if="${iter.index < 2}"
+                 class="loan-item">
+                📚 <span th:text="${loan.title}"></span>
             </div>
+
         </div>
     </div>
 
-    <!-- 로그인한 사용자에게만: 내 문의 -->
+    <!-- 로그인 사용자 전용: 내 문의 -->
     <div class="card" th:if="${user != null}">
-        <h1 style="font-size:16px;">📬 내 문의</h1>
+        <h2>📬 내 문의</h2>
 
         <div th:if="${inquiryCount == 0}" class="muted">
             아직 문의한 내역이 없습니다.
         </div>
 
         <div th:if="${inquiryCount > 0}">
+
             문의 <b th:text="${inquiryCount}"></b>건 <br>
-            <div th:if="${unreadInquiryCount > 0}">
+
+            <div th:if="${unreadInquiryCount > 0}"
+                 class="alert-error"
+                 style="margin-top:10px;">
                 🔔 새 답변 <b th:text="${unreadInquiryCount}"></b>건
             </div>
 
-            <div>
-                <a th:href="@{/inquiries/my}" class="muted">
-                    내 문의 내역 보기 →
-                </a>
-            </div>
+            <a th:href="@{/inquiries/my}" class="btn-secondary">
+                문의 내역 보기
+            </a>
+
         </div>
     </div>
 

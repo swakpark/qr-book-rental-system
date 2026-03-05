@@ -2,100 +2,67 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>내 문의 내역</title>
-    <style>
-        .page-header {
-            position: sticky;
-            top: 0;
-            background: #ffffff;
-            z-index: 100;
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .back-btn {
-            text-decoration: none;
-            font-size: 14px;
-            color: #2563eb;
-            font-weight: bold;
-        }
-        .page-header h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-        .inquiry-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            background: #ffffff;
-        }
-        .message-box {
-            background: #f9fafb;
-            padding: 12px;
-            border-radius: 8px;
-            margin: 8px 0 12px 0;
-            line-height: 1.6;
-        }
-        .status-line {
-            margin-top: 8px;
-            margin-bottom: 8px;
-        }
-        .status-waiting {
-            color: #ca8a04;
-            font-weight: bold;
-        }
-        .status-done {
-            color: #16a34a;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
 </head>
-<body>
 
-<div class="page-header">
-    <a th:href="@{/qr/entry}" class="back-btn">← 홈으로</a>
-    <h2>📬 내 문의 내역</h2>
-</div>
+<body>
 
 <div class="container">
 
-    <div th:if="${#lists.isEmpty(inquiries)}" class="card">
+    <!-- 헤더 -->
+    <div class="card">
+        <div class="inquiry-header">
+            <a th:href="@{/qr/entry}" class="back-link">⬅️ 홈 화면</a>
+        </div>
+
+        <h1>📬 내 문의 내역</h1>
+
+    </div>
+
+    <!-- 문의 없음 -->
+    <div th:if="${#lists.isEmpty(inquiries)}" class="card muted">
         아직 문의한 내역이 없습니다.
     </div>
 
+    <!-- 문의 목록 -->
     <div th:each="inq : ${inquiries}" class="card inquiry-card">
 
-        <p><b>문의 내용</b></p>
+        <div class="section-title">문의 내용</div>
+
         <div class="message-box" th:text="${inq.message}"></div>
 
-        <div th:if="${inq.overdue}"
-             style="background:#fee2e2; padding:8px;">
+        <!-- 연체 표시 -->
+        <div th:if="${inq.overdue}" class="alert-error">
             ⚠️ 연체
             (<span th:text="${inq.overdueDays}"></span>일 /
             <span th:text="${inq.penaltyAmount}"></span>원)
         </div>
 
-        <p class="status-line">
+        <!-- 상태 -->
+        <div class="status-line">
             상태:
-            <span th:if="${!inq.resolved}" class="status-waiting">
+            <span th:if="${!inq.resolved}" class="badge-waiting">
                 ⏳ 답변 대기중
             </span>
 
-            <span th:if="${inq.resolved}" class="status-done">
+            <span th:if="${inq.resolved}" class="badge-done">
                 ✅ 답변 완료
             </span>
-        </p>
-
-        <div th:if="${inq.adminReply != null}"
-             style="border-left:4px solid #22c55e; padding:10px; background:#f8fafc; margin-top:10px;">
-            <b>📢 관리자 답변</b>
-            <p th:text="${inq.adminReply}"></p>
-            <small th:text="${#temporals.format(inq.resolvedAt, 'yyyy-MM-dd HH:mm')}"></small>
         </div>
+
+        <!-- 관리자 답변 -->
+        <div th:if="${inq.adminReply != null}" class="admin-reply-box">
+            <div class="section-title">📢 관리자 답변</div>
+            <div th:text="${inq.adminReply}"></div>
+            <div class="reply-time"
+                 th:text="${#temporals.format(inq.resolvedAt, 'yyyy-MM-dd HH:mm')}">
+            </div>
+        </div>
+
     </div>
+
 </div>
 
 

@@ -2,131 +2,29 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>도서관 챗봇</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <style>
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont;
-            background: #f5f6f8;
-            display: flex;
-            justify-content: center;
-        }
-
-        .page-header {
-            position: sticky;
-            top: 0;
-            background: #ffffff;
-            z-index: 100;
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .back-btn {
-            text-decoration: none;
-            font-size: 14px;
-            color: #2563eb;
-            font-weight: bold;
-        }
-        .page-header h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .message {
-            max-width: 75%;
-            padding: 10px 14px;
-            margin-bottom: 10px;
-            border-radius: 16px;
-            font-size: 14px;
-            line-height: 1.5;
-            white-space: pre-line;
-            word-break: break-word;
-        }
-
-        .message.user {
-            align-self: flex-end;
-            background-color: #2563eb;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.bot {
-            align-self: flex-start;
-            background-color: #e5e7eb;
-            color: #111827;
-            border-bottom-left-radius: 4px;
-        }
-
-        .messages {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .clear-btn {
-            margin-left: 6px;
-            padding: 10px 12px;
-            background: #9ca3af;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 420px;
-            height: 100vh;
-            background: white;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-input {
-            display: flex;
-            padding: 12px;
-            border-top: 1px solid #e5e7eb;
-        }
-
-        input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
-            font-size: 14px;
-        }
-
-        button {
-            margin-left: 8px;
-            padding: 10px 16px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-    </style>
+    <title>도서관 챗봇</title>
+    <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
 </head>
 
 <body>
-<div class="chat-container">
+<div class="chat-wrapper">
 
-    <div class="card">
-        <div class="page-header">
-            <h2>🤖 도서관 챗봇</h2>
-            <a th:href="@{/qr/entry}" class="back-btn">← 홈 화면</a>
-        </div>
+    <!-- 상단 헤더 -->
+    <div class="chat-header">
+        <a th:href="@{/qr/entry}" class="back-link">⬅️ 홈 화면</a>
+        <h2>🤖 챗봇</h2>
     </div>
 
-    <div id="messages" class="messages"></div>
+    <!-- 메시지 영역 -->
+    <div id="messages" class="chat-messages"></div>
 
-    <div class="chat-input">
-        <input id="input" type="text" placeholder="메시지를 입력하세요…" />
-        <button onclick="sendMessage()">전송</button>
-        <button class="clear-btn" onclick="clearChat()">초기화</button>
+    <!-- 입력 영역 -->
+    <div class="chat-input-area">
+        <input id="input" type="text" placeholder="메시지를 입력하세요…" autocomplete="off"/>
+
+        <button class="btn-primary" onclick="sendMessage()">전송</button>
+        <button class="btn-gray" onclick="clearChat()">초기화</button>
     </div>
 
 </div>
@@ -134,9 +32,7 @@
 <script>
     const messages = document.getElementById("messages");
     const input = document.getElementById("input");
-    const STORAGE_KEY = "library_chat_history";
 
-    // 첫 메시지 말풍선
     document.addEventListener("DOMContentLoaded", () => {
         fetch("/api/chat/history")
             .then(res => res.json())
@@ -145,10 +41,10 @@
                 if (!history || history.length === 0) {
                     addMessage(
                         `이렇게 물어보세요 👇
-                        • 내가 빌린 책 알려줘
-                        • 반납 기한 언제야?
-                        • 대여 연장하고 싶어
-                        • 난생처음 R 코딩 & 데이터 분석 있어?`,
+• 내가 빌린 책 알려줘
+• 반납 기한 언제야?
+• 대여 연장하고 싶어
+• 난생처음 R 코딩 & 데이터 분석 있어?`,
                         "bot", false);
                     return;
                 }
@@ -166,51 +62,38 @@
         const text = input.value.trim();
         if (!text) return;
 
-        // 사용자 말풍선
         addMessage(text, "user");
         input.value = "";
+        input.focus();
 
-        // 🤖 타이핑 말풍선
         const typing = document.createElement("div");
-        typing.className = "message bot";
+        typing.className = "chat-message bot";
         typing.innerText = "입력 중…";
         messages.appendChild(typing);
         messages.scrollTop = messages.scrollHeight;
 
         fetch("/api/chat", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: text })
         })
-            .then(res => res.json())
-            .then(data => {
-                typing.remove();                 // 타이핑 제거
-                addMessage(data.reply, "bot");   // 봇 응답
-            })
-            .catch(() => {
-                typing.remove();
-                addMessage("서버와 통신 중 오류가 발생했어요 😢", "bot");
-            });
+        .then(res => res.json())
+        .then(data => {
+            typing.remove();
+            addMessage(data.reply, "bot");
+        })
+        .catch(() => {
+            typing.remove();
+            addMessage("서버와 통신 중 오류가 발생했어요 😢", "bot");
+        });
     }
 
     function addMessage(text, type, save = true) {
         const div = document.createElement("div");
-        div.className = "message " + type;
-        div.innerText = text;
+        div.className = "chat-message " + type;
+        div.innerHTML = text.replace(/\n/g, '<br>');
         messages.appendChild(div);
         messages.scrollTop = messages.scrollHeight;
-
-        if (save) {
-            saveMessage(type, text);
-        }
-    }
-
-    function saveMessage(role, text) {
-        const history = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-        history.push({ role, text });
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
     }
 
     function clearChat() {
@@ -223,13 +106,11 @@
             });
     }
 
-    // Enter 키 전송
     input.addEventListener("keydown", e => {
         if (e.key === "Enter") sendMessage();
     });
 
 </script>
-
 
 </body>
 </html>

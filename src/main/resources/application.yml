@@ -5,6 +5,11 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   admin:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}
@@ -19,7 +24,21 @@ spring:
 
   web:
     resources:
-      static-locations: file:qr-output/
+      static-locations:
+        - classpath:/static/
+        - file:qr-output/
+
+server:
+  address: 0.0.0.0
+  port: 8080
+
+qr:
+  secret: ${QR_SECRET}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 1800000
+  refresh-expiration: 604800000
 
 naver:
   api:

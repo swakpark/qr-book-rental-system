@@ -11,6 +11,6 @@ public class QrTokenService {
     private final QrTokenGenerator qrTokenGenerator;
 
     public String generateBookToken(Long bookId) {
-        return qrTokenGenerator.generate(bookId);
+        return qrTokenGenerator.generateSignature(bookId);
     }
 }

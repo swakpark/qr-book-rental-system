@@ -17,14 +17,15 @@ public class QrBatchService {
     public void generateBookQrs() throws Exception {
         for (Book book : bookRepository.findAll()) {
 
-            // 1. QR 토큰 생성 (서버 내부)
-            String token = qrTokenGenerator.generate(book.getId());
+            // 1. QR 서명 생성 (서버 내부)
+            String signature = qrTokenGenerator.generateSignature(book.getId());
 
             // 2. 토큰이 포함된 QR URL 생성
-            String url = "https://rylie-crunchier-paul.ngrok-free.dev/qr/books/"
+            String url = "https://lucky-tables-thank.loca.lt"
+                    + "/qr/books/"
                     + book.getId()
-                    + "?token="
-                    + token;
+                    + "/"
+                    + signature;
 
             // 3. QR 이미지 파일 생성
             String file = "qr-output/static-qr/books/book_" + book.getId() + ".png";
@@ -34,7 +35,7 @@ public class QrBatchService {
 
     public void generateTableQrs() throws Exception {
         for (int i = 1; i <= 10; i++) {
-            String url = "https://rylie-crunchier-paul.ngrok-free.dev/qr/entry";
+            String url = "https://lucky-tables-thank.loca.lt/qr/entry";
             String file = "qr-output/static-qr/tables/table_" + i + ".png";
             qrGenerator.generate(url, file);
         }

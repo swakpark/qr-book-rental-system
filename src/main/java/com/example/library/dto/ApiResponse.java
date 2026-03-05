@@ -1,7 +1,10 @@
 package com.example.library.dto;
 
+import lombok.Getter;
+
 import java.util.Map;
 
+@Getter
 public class ApiResponse<T> {
 
     private boolean success;
@@ -38,16 +41,4 @@ public class ApiResponse<T> {
         return new ApiResponse<>(false, message, null);
     }
 
-    // Getter
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public T getData() {
-        return data;
-    }
 }

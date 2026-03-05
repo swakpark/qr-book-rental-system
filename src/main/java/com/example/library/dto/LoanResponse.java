@@ -1,7 +1,9 @@
 package com.example.library.dto;
 
 import com.example.library.model.Loan;
+import lombok.Getter;
 
+@Getter
 public class LoanResponse {
 
     private Long loanId;
@@ -11,7 +13,8 @@ public class LoanResponse {
     private String bookTitle;
     private boolean returned;
 
-    public LoanResponse(Long loanId, Long userId, String userName, Long bookId, String bookTitle, boolean returned) {
+    public LoanResponse(Long loanId, Long userId, String userName, Long bookId,
+                        String bookTitle, boolean returned) {
         this.loanId = loanId;
         this.userId = userId;
         this.userName = userName;
@@ -29,30 +32,5 @@ public class LoanResponse {
                 loan.getBook().getTitle(),
                 loan.isReturned()
         );
-    }
-
-    // Getter
-    public Long getLoanId() {
-        return loanId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public Long getBookId() {
-        return bookId;
-    }
-
-    public String getBookTitle() {
-        return bookTitle;
-    }
-
-    public boolean isReturned() {
-        return returned;
     }
 }

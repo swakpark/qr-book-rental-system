@@ -1,6 +1,7 @@
 package com.example.library.controller.admin;
 
 import com.example.library.dto.naver.NaverBookItem;
+import com.example.library.model.Book;
 import com.example.library.service.BookService;
 import com.example.library.service.naver.NaverBookImportService;
 import com.example.library.service.naver.NaverBookService;
@@ -48,7 +49,8 @@ public class AdminBookController {
     @PostMapping("/naver/import")
     public String importBook(@RequestParam String isbn) {
         NaverBookItem item = naverBookService.search(isbn).get(0);
-        naverBookImportService.importFromNaver(item);
+        Book book = naverBookImportService.createBookFromNaver(item);
+        bookService.registerBookAutoLocation(book);
         return "redirect:/admin/books/naver";
     }
 }

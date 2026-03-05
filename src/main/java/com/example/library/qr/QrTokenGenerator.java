@@ -1,30 +1,36 @@
 package com.example.library.qr;
 
-import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
 @Component
 public class QrTokenGenerator {
 
-    private static final String SECRET_KEY = "qr-secret-key";
-    private static final long EXPIRE_DURATION_MS = 24 * 60 * 60 * 1000; // 시연을 위해 24시간으로 토큰 만료 시간 설정
+    @Value("${qr.secret}")
+    private String secretKey;
 
-    public String generate(Long bookId) {
+    private static final String HMAC_ALGO = "HmacSHA256";
 
-        long issuedAt = System.currentTimeMillis();
-        long expiresAt = issuedAt + EXPIRE_DURATION_MS;
+    public String generateSignature(Long bookId) {
+        try {
+            String data = String.valueOf(bookId);
 
-        String signature = generateSignature(bookId, issuedAt, expiresAt);
+            Mac mac = Mac.getInstance(HMAC_ALGO);
+            SecretKeySpec keySpec = new SecretKeySpec(secretKey.getBytes(), HMAC_ALGO);
 
-        String rawToken = bookId + ":" + issuedAt + ":" + expiresAt + ":" + signature;
+            mac.init(keySpec);
 
-        return Base64.getEncoder().encodeToString(rawToken.getBytes());
-    }
+            byte[] hmacBytes = mac.doFinal(data.getBytes());
 
-    private String generateSignature(long bookId, long issuedAt, long expiresAt) {
-        String data = bookId + ":" + issuedAt + ":" + expiresAt + ":" + SECRET_KEY;
-        return DigestUtils.sha256Hex(data);
+            // URL에 쓰기 좋게 Base64 URL Safe로 인코딩
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hmacBytes);
+
+        } catch (Exception e) {
+            throw new RuntimeException("QR HMAC 생성 실패", e);
+        }
     }
 }

@@ -3,7 +3,9 @@ package com.example.library.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
 
+@Getter
 public class CreateUserRequest {
 
     @NotBlank(message = "이름은 필수입니다.")
@@ -17,16 +19,4 @@ public class CreateUserRequest {
     @Size(min = 6, message = "비밀번호는 최소 6자 이상이어야 합니다.")
     private String password;
 
-    // Getter
-    public String getName() {
-        return name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 }

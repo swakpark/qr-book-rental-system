@@ -2,103 +2,103 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>관리자 문의 관리</title>
-    <style>
-        .page-header {
-            position: sticky;
-            top: 0;
-            background: #ffffff;
-            z-index: 100;
-            padding: 12px 16px;
-            border-bottom: 1px solid #e5e7eb;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .back-btn {
-            text-decoration: none;
-            font-size: 14px;
-            color: #2563eb;
-            font-weight: bold;
-        }
-        .page-header h2 {
-            margin: 0;
-            font-size: 18px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
 </head>
+
 <body>
 
-<h1>📨 관리자 문의 관리</h1>
+<div class="admin-container">
 
-<div class="page-header">
-    <span th:if="${viewType == 'pending'}">❓ 미처리 문의</span>
-    <span th:if="${viewType == 'all'}">📄 전체 문의</span>
-    <a th:href="@{/admin/dashboard}" class="back-btn">← 관리자 허브</a>
-</div>
+    <!-- 헤더 -->
+    <div class="admin-header">
+        <h1>
+            <span th:if="${viewType == 'pending'}">❓ 미처리 문의</span>
+            <span th:if="${viewType == 'all'}">📄 전체 문의</span>
+        </h1>
 
-<hr/>
-
-<div th:if="${#lists.isEmpty(inquiries)}">
-    <p th:if="${viewType == 'pending'}">미처리 문의가 없습니다 🎉</p>
-    <p th:if="${viewType == 'all'}">등록된 문의가 없습니다.</p>
-</div>
-
-
-<div th:each="inq : ${inquiries}"
-     style="border:1px solid #ddd; padding:12px; margin-bottom:12px;">
-
-    <p><b>문의 ID:</b> <span th:text="${inq.id}"></span></p>
-    <p><b>사용자:</b> <span th:text="${inq.user.name}"></span></p>
-    <p><b>문의 내용:</b></p>
-    <p th:text="${inq.message}"></p>
-
-    <div th:if="${inq.overdue}"
-         style="background:#fee2e2; padding:8px;">
-        ⚠️ 연체
-        (<span th:text="${inq.overdueDays}"></span>일 /
-        <span th:text="${inq.penaltyAmount}"></span>원)
+        <a th:href="@{/admin/dashboard}" class="btn-gray small">
+            ← 관리자 허브
+        </a>
     </div>
 
-    <p>
-        상태:
-        <span th:text="${inq.resolved ? '처리 완료' : '미처리'}"></span>
-    </p>
-
-    <p>
-        문의 접수 시각:
-        <strong
-                th:text="${#temporals.format(inq.createdAt, 'yyyy-MM-dd HH:mm')}">
-        </strong>
-    </p>
-
-    <!-- 관리자 답변 영역 -->
-    <div th:if="${!inq.resolved}" style="margin-top:12px;">
-        <form th:action="@{/admin/inquiries/{id}/reply(id=${inq.id})}"
-              method="post"
-              onsubmit="return confirm('이 답변을 저장하고 문의를 처리 완료할까요?')">
-
-            <label><b>관리자 답변</b></label><br/>
-            <textarea name="reply"
-                      rows="4"
-                      style="width:100%; margin-top:6px;"
-                      placeholder="관리자 답변을 입력하세요"
-                      required></textarea>
-
-            <button type="submit" style="margin-top:8px;">
-                답변 저장 & 처리 완료
-            </button>
-        </form>
+    <!-- 문의 없음 -->
+    <div th:if="${#lists.isEmpty(inquiries)}" class="card muted">
+        <span th:if="${viewType == 'pending'}">
+            미처리 문의가 없습니다 🎉
+        </span>
+        <span th:if="${viewType == 'all'}">
+            등록된 문의가 없습니다.
+        </span>
     </div>
 
-    <div th:if="${inq.resolved and inq.adminReply != null}"
-         style="background:#f0f9ff; padding:10px; margin-top:10px;">
-        <b>관리자 답변</b><br/>
-        <p th:text="${inq.adminReply}"></p>
-        <small th:text="${#temporals.format(inq.resolvedAt, 'yyyy-MM-dd HH:mm')}"></small>
+    <!-- 문의 목록 -->
+    <div th:each="inq : ${inquiries}" class="card">
+
+        <div class="admin-inquiry-meta">
+            <div><b>문의 ID:</b> <span th:text="${inq.id}"></span></div>
+            <div><b>사용자:</b> <span th:text="${inq.user.name}"></span></div>
+        </div>
+
+        <div class="admin-inquiry-message">
+            <b>문의 내용</b>
+            <div class="message-box"
+                 th:text="${inq.message}"></div>
+        </div>
+
+        <!-- 연체 정보 -->
+        <div th:if="${inq.overdue}" class="alert-error">
+            ⚠️ 연체
+            (<span th:text="${inq.overdueDays}"></span>일 /
+            <span th:text="${inq.penaltyAmount}"></span>원)
+        </div>
+
+        <div class="admin-inquiry-status">
+            상태:
+            <span th:text="${inq.resolved ? '처리 완료' : '미처리'}"></span>
+        </div>
+
+        <div class="muted">
+            문의 접수:
+            <strong th:text="${#temporals.format(inq.createdAt, 'yyyy-MM-dd HH:mm')}"></strong>
+        </div>
+
+        <!-- 답변 작성 -->
+        <div th:if="${!inq.resolved}" class="admin-reply-form">
+
+            <form th:action="@{/admin/inquiries/{id}/reply(id=${inq.id})}"
+                  method="post"
+                  onsubmit="return confirm('이 답변을 저장하고 문의를 처리 완료할까요?')">
+
+                <textarea name="reply"
+                          placeholder="관리자 답변을 입력하세요"
+                          required></textarea>
+
+                <button type="submit" class="btn-primary">
+                    답변 저장 & 처리 완료
+                </button>
+
+            </form>
+
+        </div>
+
+        <!-- 답변 완료 상태 -->
+        <div th:if="${inq.resolved and inq.adminReply != null}"
+             class="admin-reply-box">
+
+            <b>📢 관리자 답변</b>
+            <div class="message-box"
+                 th:text="${inq.adminReply}"></div>
+
+            <div class="muted">
+                <small th:text="${#temporals.format(inq.resolvedAt, 'yyyy-MM-dd HH:mm')}"></small>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
-
 </body>
 </html>

@@ -1,9 +1,12 @@
 package com.example.library.model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDate;
 
 @Entity
+@Getter
 public class Loan {
 
     @Id
@@ -76,30 +79,5 @@ public class Loan {
 
             this.dueDate = this.dueDate.plusDays(14);
             this.extensionCount++;
-    }
-
-    // Getter / Setter
-    public Long getId() {
-        return id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public boolean isReturned() {
-        return returned;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setReturned(boolean returned) {
-        this.returned = returned;
     }
 }
