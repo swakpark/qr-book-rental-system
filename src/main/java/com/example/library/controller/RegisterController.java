@@ -1,14 +1,12 @@
 package com.example.library.controller;
 
+import com.example.library.security.RefreshTokenService;
 import com.example.library.service.CustomUserDetailsService;
 import com.example.library.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.example.library.security.JwtProvider;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
@@ -19,10 +17,15 @@ public class RegisterController {
 
     private final UserService userService;
     private final CustomUserDetailsService userDetailsService;
+    private final JwtProvider jwtProvider;
+    private final RefreshTokenService refreshTokenService;
 
-    public RegisterController(UserService userService, CustomUserDetailsService userDetailsService) {
+    public RegisterController(UserService userService, CustomUserDetailsService userDetailsService,
+                              JwtProvider jwtProvider, RefreshTokenService refreshTokenService) {
         this.userService = userService;
         this.userDetailsService = userDetailsService;
+        this.jwtProvider = jwtProvider;
+        this.refreshTokenService = refreshTokenService;
     }
 
     // 회원가입 화면
@@ -42,30 +45,42 @@ public class RegisterController {
             @RequestParam String email,
             @RequestParam String password,
             @RequestParam(required = false) String redirect,
-            HttpServletRequest request
+            HttpServletResponse response
     ) {
+
+        // 자동 로그인
         // 회원가입
         userService.register(name, email, password);
 
-        // 자동 로그인 처리
+        // 사용자 정보 로드
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
-        );
+        String role = userDetails.getAuthorities()
+                .iterator()
+                .next()
+                .getAuthority();
 
-        // SecurityContext에 설정
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authentication);
-        SecurityContextHolder.setContext(context);
+        // JWT 생성
+        String accessToken = jwtProvider.createToken(email, role);
+        String refreshToken = jwtProvider.createRefreshToken(email);
 
-        // 세션에 저장
-        request.getSession(true)
-                .setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-                        context
-                );
+        // Redis에 Refresh 저장
+        refreshTokenService.save(email, refreshToken, jwtProvider.getRefreshExpiration());
+
+        // Access 쿠키
+        Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken);
+        accessCookie.setHttpOnly(true);
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(60 * 30);
+
+        // Refresh 쿠키
+        Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(60 * 60 * 24 * 7);
+
+        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);
 
         // redirect 복귀
         if (redirect != null && !redirect.isBlank()) {

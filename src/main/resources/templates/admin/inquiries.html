@@ -18,9 +18,7 @@
             <span th:if="${viewType == 'all'}">📄 전체 문의</span>
         </h1>
 
-        <a th:href="@{/admin/dashboard}" class="btn-gray small">
-            ← 관리자 허브
-        </a>
+        <a th:href="@{/admin/dashboard}" class="back-link">⬅️ 관리자 허브</a>
     </div>
 
     <!-- 문의 없음 -->
@@ -38,14 +36,22 @@
 
         <div class="admin-inquiry-meta">
             <div><b>문의 ID:</b> <span th:text="${inq.id}"></span></div>
-            <div><b>사용자:</b> <span th:text="${inq.user.name}"></span></div>
+            <div>
+                <b>사용자:</b>
+                <span th:text="${inq.user.name}"></span>
+                <span class="muted">(<span th:text="${inq.user.email}"></span>)</span>
+            </div>
         </div>
+
+        <hr>
 
         <div class="admin-inquiry-message">
             <b>문의 내용</b>
             <div class="message-box"
                  th:text="${inq.message}"></div>
         </div>
+
+        <hr>
 
         <!-- 연체 정보 -->
         <div th:if="${inq.overdue}" class="alert-error">

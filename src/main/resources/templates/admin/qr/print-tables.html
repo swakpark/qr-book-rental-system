@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>테이블 QR 인쇄</title>
+    <title>홈 페이지 QR 인쇄</title>
     <link rel="stylesheet" th:href="@{/css/common.css(v=5)}">
 </head>
 
@@ -13,14 +13,13 @@
 
     <!-- 화면용 헤더 (인쇄 시 숨김) -->
     <div class="admin-header print-hide">
-        <h1>🪑 테이블 QR 코드</h1>
-        <a th:href="@{/admin/dashboard}" class="btn-gray small">
-            ← 관리자 허브
-        </a>
+        <h1>📱 홈 페이지 QR 코드</h1>
+        <a th:href="@{/admin/dashboard}" class="back-link">⬅️ 관리자 허브</a>
     </div>
 
     <div class="card print-hide muted">
-        📱 테이블 QR을 스캔하면 도서관 서비스를 이용할 수 있습니다.<br>
+        📱 QR을 스캔하면 도서관 서비스를 이용할 수 있습니다.<br>
+        QR 부착: 1층(입구, 카운터), 2층(집중석, 다목적실)
         (도서 검색 · 챗봇 · 내 대여 목록 · 관리자 문의 등)
     </div>
 

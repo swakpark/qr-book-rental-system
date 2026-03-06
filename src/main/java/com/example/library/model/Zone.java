@@ -37,12 +37,6 @@ public class Zone {
     private Integer offsetY; // 위쪽 시작 %
 
     @Column(nullable = false)
-    private Integer x;
-
-    @Column(nullable = false)
-    private Integer y;
-
-    @Column(nullable = false)
     private int width; // 영역 너비 %
 
     @Column(nullable = false)

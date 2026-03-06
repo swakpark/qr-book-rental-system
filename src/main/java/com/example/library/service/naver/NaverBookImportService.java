@@ -61,36 +61,48 @@ public class NaverBookImportService {
         return null;
     }
 
+    // 핵심 키워드 셋 보강 (설명문에 흔히 나오는 단어 제외)
     private static final Map<String, List<String>> CATEGORY_KEYWORDS = Map.of(
-            "900", List.of("역사", "세계사", "한국사", "지리", "고고학", "여행", "전기"),
-            "800", List.of("문학", "시", "소설", "수필", "희곡", "일기", "평론"),
-            "700", List.of("언어", "한국어", "중국어", "일본어", "영어", "독일어", "프랑스어"),
-            "600", List.of("예술", "조각", "건축", "회화", "사진", "음악", "공연예술", "체육"),
-            "500", List.of("기술과학", "의학", "농업", "공학", "건축", "가정학"),
-            "400", List.of("자연과학", "수학", "물리", "화학", "천문학", "지학", "생물학", "식물학", "동물학"),
-            "300", List.of("사회과학", "정치", "경제", "사회학", "교육", "법률", "행정", "관습"),
-            "200", List.of("종교", "비교종교학", "불교", "기독교", "도교", "힌두교"),
-            "100", List.of("철학", "심리학", "윤리학", "동양철학", "서양철학"),
-            "000", List.of("총류", "백과사전", "도서관학", "신문", "컴퓨터과학", "일반저작물")
+            "900", List.of("역사", "세계사", "한국사", "지리", "고고학", "유적", "근현대사"),
+            "800", List.of("소설", "장편소설", "시집", "희곡", "에세이", "문학선", "단편소설"),
+            "700", List.of("언어학", "문법", "회화", "사전", "어휘", "외국어", "작문"),
+            "600", List.of("미술", "음악", "조각", "회화", "전시", "공연", "예술가", "필름"),
+            "500", List.of("공학", "의학", "농업", "요리", "가정학", "기술실무", "매뉴얼"),
+            "400", List.of("자연과학", "물리학", "화학", "생물학", "천문", "수학적", "나노"),
+            "300", List.of("정치학", "경제학", "법률", "행정", "교육학", "사회학", "통계"),
+            "200", List.of("불교", "기독교", "성경", "신학", "교리", "힌두교", "신앙"),
+            "100", List.of("철학", "심리학", "윤리학", "형이상학", "사상가", "논리학"),
+            "000", List.of("컴퓨터공학", "데이터베이스", "도서관", "프로그래밍", "백과사전")
     );
 
     private String extractCode(NaverBookItem item) {
 
-        String text = (clean(item.getTitle()) + " " + clean(item.getDescription()))
-                .toLowerCase();
+        // 제목과 설명 분리 (제목의 중요도가 훨씬 높음)
+        String title = clean(item.getTitle()).toLowerCase();
+        String description = clean(item.getDescription()).toLowerCase();
 
         String bestCode = "000";
-        int bestScore = 0;
+        double bestScore = 0.0;
 
+        // 점수가 같을 경우를 대비해서 특정 카테고리에 우선순위를 두고 싶으면
+        // CATEGORY_KEYWORDS 정의 시 LinkedHashMap을 사용하여 순서를 고정하는 것
         for (Map.Entry<String, List<String>> entry : CATEGORY_KEYWORDS.entrySet()) {
 
             String code = entry.getKey();
             List<String> keywords = entry.getValue();
 
-            int score = countMatches(text, keywords);
+            // 1. 제목에서 키워드 매칭 (가중치 3.0)
+            int titleScore = countMatches(title, keywords);
 
-            if (score > bestScore) {
-                bestScore = score;
+            // 2. 설명에서 키워드 매칭 (가중치 1.0)
+            int descScore = countMatches(description, keywords);
+
+            // 3. 최종 점수 계산
+            double totalScore = (titleScore * 3.0) + descScore;
+
+            // 4. 더 높은 점수가 나오면 갱신
+            if (totalScore > bestScore) {
+                bestScore = totalScore;
                 bestCode = code;
             }
         }

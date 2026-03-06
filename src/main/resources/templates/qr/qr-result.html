@@ -28,7 +28,7 @@
 
         <!-- 정상 처리 버튼 -->
         <a th:if="${book != null}"
-           class="btn"
+           class="btn-primary"
            th:href="@{/qr/books/{id}/{signature}(id=${book.id}, signature=${signature})}">
             도서 페이지로 돌아가기
         </a>

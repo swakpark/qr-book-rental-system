@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -21,9 +22,6 @@
             <span th:if="${isLoggedIn}">
                 현재 사용자: <b th:text="${user.name}">사용자</b>
             </span>
-            <span th:if="${!isLoggedIn}">
-                로그인 후 대여할 수 있어요
-            </span>
         </div>
     </div>
 
@@ -36,8 +34,11 @@
         </div>
 
         <h2 class="book-title" th:text="${book.title}"></h2>
-        <p>저자: <span th:text="${book.author}"></span></p>
-        <p class="isbn">ISBN: <span th:text="${book.isbn}"></span></p>
+
+        <div class="book-meta">
+            <p>저자 <b th:text="${book.author}"></b></p>
+            <p class="isbn">ISBN <span th:text="${book.isbn}"></span></p>
+        </div>
 
         <!-- 연체 안내 -->
         <div th:if="${overduePolicy != null and !overduePolicy.canBorrow()}"
@@ -46,52 +47,52 @@
             연체료 <span th:text="${overduePolicy.penaltyAmount}"></span>원
         </div>
 
-        <!-- 대여 가능 -->
-        <div th:if="${state.name() == 'AVAILABLE'
-            and (overduePolicy == null or overduePolicy.canBorrow())}">
+        <div class="action-group">
+            <!-- 대여 가능 -->
+            <div th:if="${state.name() == 'AVAILABLE'
+                and (overduePolicy == null or overduePolicy.canBorrow())}">
 
-            <p class="status available">지금 대여 가능합니다</p>
+                <p class="status available">지금 대여 가능합니다</p>
 
-            <!-- 로그인 상태 -->
-            <form th:if="${isLoggedIn}"
-                  th:action="@{/qr/books/{id}/{signature}/loan(id=${book.id}, signature=${signature})}"
-                  method="post"
-                  onsubmit="handleSubmit(this, '대여 처리 중...')">
-                <button type="submit" class="btn-primary">대여하기</button>
+                <!-- 로그인 상태 -->
+                <form th:if="${isLoggedIn}"
+                      th:action="@{/qr/books/{id}/{signature}/loan(id=${book.id}, signature=${signature})}"
+                      method="post"
+                      onsubmit="handleSubmit(this, '대여 처리 중...')">
+                    <button type="submit" class="btn-primary">대여하기</button>
+                </form>
+            </div>
+
+            <!-- 대여 중 -->
+            <div th:if="${state.name() == 'LOANED'}">
+
+                <p class="status unavailable">현재 대여 중입니다</p>
+
+                <form th:if="${isLoggedIn and loan != null and loan.user.id == user.id}"
+                      th:action="@{/qr/books/{id}/{signature}/return(id=${book.id}, signature=${signature})}"
+                      method="post"
+                      onsubmit="handleSubmit(this, '반납 처리 중...')">
+                    <button type="submit" class="btn-primary">반납하기</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="logout-section">
+            <!-- 로그아웃 -->
+            <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post">
+                <button type="submit" class="btn-outline logout-btn">로그아웃</button>
             </form>
         </div>
 
-        <!-- 대여 중 -->
-        <div th:if="${state.name() == 'LOANED'}">
-
-            <p class="status unavailable">현재 대여 중입니다</p>
-
-            <form th:if="${isLoggedIn and loan != null and loan.user.id == user.id}"
-                  th:action="@{/qr/books/{id}/{signature}/return(id=${book.id}, signature=${signature})}"
-                  method="post"
-                  onsubmit="handleSubmit(this, '반납 처리 중...')">
-                <button type="submit" class="btn-primary">반납하기</button>
-            </form>
-
-            <p class="sub-text">
-                반납 후 다시 대여할 수 있습니다.
-            </p>
-        </div>
-
-        <!-- 로그아웃 -->
-        <form th:if="${isLoggedIn}" th:action="@{/logout}" method="post">
-            <button type="submit" class="btn-outline">로그아웃</button>
-        </form>
-
-        <div class="footer">
-            도서 상태에 따라 대여 또는 반납할 수 있습니다.
+        <div class="footer" th:if="${!isLoggedIn}">
+            로그인 후 도서를 대여 또는 반납을 할 수 있습니다.
         </div>
     </div>
 
     <!-- 로그인 유도 -->
     <div th:if="${!isLoggedIn}" class="login-link">
         <a th:href="@{/login(redirect=${'/qr/books/' + book.id + '/' + signature})}">
-            로그인 / 회원가입 →
+            로그인 / 회원가입
         </a>
     </div>
 </div>

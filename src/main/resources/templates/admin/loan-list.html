@@ -12,10 +12,8 @@
 
     <!-- 헤더 -->
     <div class="admin-header">
-        <h1>📚 도서 대여 목록</h1>
-        <a th:href="@{/admin/dashboard}" class="btn-gray small">
-            ← 관리자 허브
-        </a>
+        <h1>📚 도서 대여/반납 목록</h1>
+        <a th:href="@{/admin/dashboard}" class="back-link">⬅️ 관리자 허브</a>
     </div>
 
     <!-- 대여 없음 -->
@@ -34,8 +32,14 @@
                 </a>
             </div>
 
-            <div class="admin-row-user">
-                👤 <span th:text="${loan.user.name}"></span>
+            <div class="user-info">
+                <div class="admin-row-user">
+                    👤 <span th:text="${loan.user.name}"></span>
+                </div>
+
+                <div class="admin-row-email">
+                    (<span th:text="${loan.user.email}"></span>)
+                </div>
             </div>
 
             <div class="admin-row-status"

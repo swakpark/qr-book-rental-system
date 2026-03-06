@@ -20,8 +20,8 @@ public class QrBatchService {
             // 1. QR 서명 생성 (서버 내부)
             String signature = qrTokenGenerator.generateSignature(book.getId());
 
-            // 2. 토큰이 포함된 QR URL 생성
-            String url = "https://lucky-tables-thank.loca.lt"
+            // 2. 서명이 포함된 QR URL 생성
+            String url = "https://forty-hotels-wish.loca.lt"
                     + "/qr/books/"
                     + book.getId()
                     + "/"
